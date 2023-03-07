@@ -7,12 +7,12 @@ import styles from "./Home.module.css";
 const Home = () => {
   const navigate = useNavigate();
 
-  const signInLinkStyle = {
-    color: "#0077ff",
-    fontWeight: "bold",
-    textDecoration: "none",
-    marginLeft: "10px",
-  };
+  // const signInLinkStyle = {
+  //   color: "#0077ff",
+  //   fontWeight: "bold",
+  //   textDecoration: "none",
+  //   marginLeft: "10px",
+  // };
 
   const onHandleFun = () => {
     navigate("/authenticate");

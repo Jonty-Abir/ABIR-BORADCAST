@@ -1,11 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 function GustRoute({ children, ...rest }) {
-  const isAuth = false;
-  const user = {
-    activated: true,
-  };
+  const { user, isAuth } = useSelector((state) => state.auth);
+
   return (
     <>
       {isAuth ? (

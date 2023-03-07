@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import Button from "../../../../Components/shared/Button/Button";
 import Card from "../../../../Components/shared/Card/Card";
-import { sendOtp } from "../../../../http/index";
+import { sendOtp } from "../../../../helper/helper";
 import { setOtp } from "../../../../store/authSlice";
 import styles from "../StepPhoneEmail.module.css";
 
@@ -11,10 +11,14 @@ const Phone = ({ onNext }) => {
   const dispatch = useDispatch();
 
   async function submit() {
-    const { data } = await sendOtp({ phone: phoneNumber });
-    console.log(data);
-    dispatch(setOtp({ phone: data.phone, hash: data.hash }));
-    onNext();
+    try {
+      if (!phoneNumber) return;
+      const data = await sendOtp({ phoneNo: phoneNumber });
+      dispatch(setOtp({ phone: data.phone, hash: data.hash }));
+      onNext();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (

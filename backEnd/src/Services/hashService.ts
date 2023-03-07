@@ -1,9 +1,9 @@
 import crypto from "crypto";
 
 class HashService {
-  async hashData(data) {
+  async hashData(data: string) {
     const hash = crypto
-      .createHmac("sha256", process.env.SECRET)
+      .createHmac("sha256", process.env.SECRET as string)
       .update(data.toString())
       .digest("hex");
     return hash;

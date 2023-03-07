@@ -1,21 +1,50 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
 import GustRoute from "./Components/Routes/GustRoute";
 import ProtectedRoute from "./Components/Routes/ProtectedRoute";
 import SemiProtected from "./Components/Routes/SemiProtected";
+import Loader from "./Components/shared/Loader/Loader";
 import NavBar from "./Components/shared/Navigation/Navigation";
 import Active from "./pages/Active/Active";
 import Authenticate from "./pages/Authenticate/Authenticate ";
 import Home from "./pages/Home/Home";
 import Rooms from "./pages/Rooms/Rooms";
+import { setAuth } from "./store/authSlice";
 
 function App() {
+  // const { loading } = useAutoLogin();
+  const disPatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await axios.get(
+          `${process.env.REACT_APP_API_URL}/refresh-token`,
+          {
+            withCredentials: true,
+          }
+        );
+        disPatch(setAuth(data));
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        console.log(err.message);
+      }
+    })();
+  }, []);
+
   const router = createBrowserRouter([
     {
       path: "/",
       element: (
         <GustRoute>
-          <Home />
+          <>
+            <NavBar />
+            <Home />
+          </>
         </GustRoute>
       ),
     },
@@ -23,7 +52,10 @@ function App() {
       path: "/authenticate",
       element: (
         <GustRoute>
-          <Authenticate />
+          <>
+            <NavBar />
+            <Authenticate />
+          </>
         </GustRoute>
       ),
     },
@@ -31,7 +63,10 @@ function App() {
       path: "/active",
       element: (
         <SemiProtected>
-          <Active />
+          <>
+            <NavBar />
+            <Active />
+          </>
         </SemiProtected>
       ),
     },
@@ -40,16 +75,20 @@ function App() {
       path: "/rooms",
       element: (
         <ProtectedRoute>
-          <Rooms />
+          <>
+            <NavBar />
+            <Rooms />
+          </>
         </ProtectedRoute>
       ),
     },
     { path: "*", element: <h2>Not found</h2> },
   ]);
-
+  if (loading) {
+    return <Loader message="Loading..." />;
+  }
   return (
     <main>
-      <NavBar />
       <RouterProvider router={router} />
     </main>
   );

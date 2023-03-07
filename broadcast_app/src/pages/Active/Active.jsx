@@ -14,7 +14,7 @@ function Active() {
     setStep(stepNo + 1);
   };
   return (
-    <div>
+    <div className="flex justify-center items-center mt-12">
       <Steps onNext={onNext} />
     </div>
   );

@@ -15,18 +15,18 @@ class OtpService {
 
   /***_______  Verify OTP   ________**/
 
-  async verifyOtp(hashOtp, data) {
+  async verifyOtp(hashOtp: string, data: string) {
     try {
       let computedHash = await hashService.hashData(data);
       return computedHash === hashOtp;
-    } catch (err) {
+    } catch (err: any) {
       return err?.message;
     }
   }
 
   /***_______  SENDING SMS with TWILIO   ________**/
 
-  async sendBySms(phone, otp) {
+  async sendBySms(phone: string, otp: string) {
     try {
       const sms_auth = process.env.TWILIO_AUTH_SID;
       const sms_token = process.env.TWILIO_AUTH_TOKEN;
@@ -39,7 +39,7 @@ class OtpService {
         from: process.env.TWILIO_AUTH_NUMBER,
         body: `Your ABIR BORDCAST OTP IS :${otp}`,
       });
-    } catch (err) {
+    } catch (err: any) {
       return err.messages;
     }
   }
