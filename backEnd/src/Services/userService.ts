@@ -53,6 +53,8 @@ class UserService {
       return err;
     }
   }
+  /***_______  Delete Aavtar   ________**/
+
   async deleteFile(path: string) {
     fs.unlink(path, (err) => {
       if (err) {

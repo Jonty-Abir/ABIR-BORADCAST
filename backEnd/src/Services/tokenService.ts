@@ -56,6 +56,8 @@ class TokenService {
   async updateRefreshToken(userId: string, token: string) {
     return await RefreshToken.updateOne({ userId }, { token }, { new: true });
   }
+  /***______________________________  Remove refresh token   _______________________________**/
+
   async removeToken(refreshToken: string) {
     try {
       await RefreshToken.deleteOne({ token: refreshToken });

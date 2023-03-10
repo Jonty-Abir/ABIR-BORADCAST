@@ -4,11 +4,18 @@ const userSchema = new Schema(
   {
     phone: { type: String, required: true },
     name: { type: String, required: false },
-    avatar: { type: String, required: false },
+    avatar: {
+      type: String,
+      required: false,
+      get: (avatar: String) => `${process.env.STATIC_URL}${avatar}`,
+    },
     activated: { type: Boolean, required: false, default: false },
   },
   {
     timestamps: true,
+    toJSON: {
+      getters: true,
+    },
   }
 );
 

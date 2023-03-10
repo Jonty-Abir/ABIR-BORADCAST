@@ -3,6 +3,7 @@ import express from "express";
 // Internal Import's
 import { activateController } from "../Controllers/activateController";
 import { authController } from "../Controllers/authController";
+import { rooms } from "../Controllers/roomsController";
 import { authMiddleware } from "../Middlewares/authMiddleware";
 
 const router = express.Router();
@@ -25,12 +26,20 @@ router.post("/verify-otp", authController.verifyOtp);
 
 router.post("/activate-user", authMiddleware, activateController.activate);
 
-/***_______  http://localhost:8080/api/refresh-token  POST  ________**/
+/***_______  http://localhost:8080/api/refresh-token  GET  ________**/
 
 router.get("/refresh-token", authController.refreshToken);
 
 /***_______  http://localhost:8080/api/refresh-token  POST  ________**/
 
 router.post("/logout", authMiddleware, authController.userLogout);
+
+/***_______  http://localhost:8080/api/rooms  POST  ________**/
+
+router.post("/rooms", authMiddleware, rooms.create);
+
+/***_______  http://localhost:8080/api/rooms  GET  ________**/
+
+router.get("/rooms", authMiddleware, rooms.getAllRooms);
 
 export { router };

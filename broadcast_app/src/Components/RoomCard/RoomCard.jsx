@@ -1,29 +1,31 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./RoomCard.module.css";
 
 const RoomCard = ({ room }) => {
+  const navigate = useNavigate();
   return (
     <div
       onClick={() => {
-        // history.push(`/room/${room.id}`);
+        navigate(`/room/${room._id}`);
       }}
       className={styles.card}
     >
-      <h3 className={styles.topic}>{room.topic}</h3>
+      <h3 className={`font-bold`}>{room.tropic}</h3>
       <div
         className={`${styles.speakers} ${
-          room.speakers.length === 1 ? styles.singleSpeaker : ""
+          room.speaker.length === 1 ? styles.singleSpeaker : ""
         }`}
       >
         <div className={styles.avatars}>
-          {room.speakers.map((speaker) => (
+          {room.speaker.map((speaker) => (
             <img key={speaker.id} src={speaker.avatar} alt="speaker-avatar" />
           ))}
         </div>
         <div className={`${styles.names} ml-[40%]`}>
-          {room.speakers.map((speaker) => (
+          {room.speaker.map((speaker) => (
             <div key={speaker.id} className="flex ">
-              <span className="text-lg font-semibold">{speaker.name}</span>
+              <span className="text-sm font-semibold">{speaker.name}</span>
               <img
                 src="/images/commments.png"
                 alt="chat-bubble"
@@ -35,7 +37,7 @@ const RoomCard = ({ room }) => {
         </div>
       </div>
       <div className={styles.peopleCount}>
-        <span>{room.totalPeople}</span>
+        <span>{1}</span>
         <img src="/images/user-icon.png" alt="user-icon" />
       </div>
     </div>

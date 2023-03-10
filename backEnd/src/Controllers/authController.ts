@@ -36,6 +36,7 @@ class AuthController {
     }
   }
   /***______________________________  verifyOtp   _______________________________**/
+
   async verifyOtp(req: Request, res: Response) {
     try {
       const { otp, hash, phone } = req.body;
@@ -150,6 +151,8 @@ class AuthController {
     // response
     res.status(200).json({ auth: true, user: userDtoForClient });
   }
+  /***_______  Logout User   ________**/
+
   async userLogout(req: Request, res: Response) {
     const { refreshToken } = req.cookies;
     try {

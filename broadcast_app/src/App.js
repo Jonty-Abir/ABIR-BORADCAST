@@ -11,6 +11,7 @@ import NavBar from "./Components/shared/Navigation/Navigation";
 import Active from "./pages/Active/Active";
 import Authenticate from "./pages/Authenticate/Authenticate ";
 import Home from "./pages/Home/Home";
+import Room from "./pages/Room/Room";
 import Rooms from "./pages/Rooms/Rooms";
 import { setAuth } from "./store/authSlice";
 
@@ -78,6 +79,17 @@ function App() {
           <>
             <NavBar />
             <Rooms />
+          </>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/room/:id",
+      element: (
+        <ProtectedRoute>
+          <>
+            <NavBar />
+            <Room />
           </>
         </ProtectedRoute>
       ),

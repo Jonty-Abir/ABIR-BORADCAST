@@ -1,21 +1,22 @@
 import React, { useState } from "react";
-import TextInput from "../shared/TextInput/TextInput";
+import { useNavigate } from "react-router-dom";
+import { createRoom as create } from "../../helper/helper";
 import styles from "./AddRoomModal.module.css";
 
 const AddRoomModal = ({ onClose }) => {
-  // const history = useHistory();
+  const navigation = useNavigate();
 
   const [roomType, setRoomType] = useState("open");
-  const [topic, setTopic] = useState("");
+  const [tropic, setTropic] = useState("");
 
   async function createRoom() {
-    // try {
-    //     if (!topic) return;
-    //     const { data } = await create({ topic, roomType });
-    //     history.push(`/room/${data.id}`);
-    // } catch (err) {
-    //     console.log(err.message);
-    // }
+    try {
+      if (!tropic) return;
+      const { room } = await create(tropic, roomType);
+      navigation(`/room/${room._id}`);
+    } catch (err) {
+      console.log(err.message);
+    }
   }
 
   return (
@@ -27,49 +28,51 @@ const AddRoomModal = ({ onClose }) => {
         <div className={styles.modalHeader}>
           <h3 className={styles.heading}>Enter the topic to be disscussed</h3>
           <div className="flex items-center gap-3 ">
-            <TextInput
-              fullwidth="true"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
+            <input
+              className="bg-[#323232] px-3 py-3 rounded-md focus:outline-none w-full placeholder:text-gray-600 font-semibold"
+              placeholder="Enter disscation tropic to create"
+              value={tropic}
+              onChange={(e) => setTropic(e.target.value)}
               id="id"
             />
             <label htmlFor="id">
-              <img src="/images/search.png" alt="close" />
+              <img src="/images/qa.png" alt="close" width={40} />
             </label>
           </div>
           <h2 className={styles.subHeading}>Room types</h2>
           <div className={styles.roomTypes}>
             <div
               onClick={() => setRoomType("open")}
-              className={`${styles.typeBox} ${
+              className={`justify-evenly ${styles.typeBox} ${
                 roomType === "open" ? styles.active : ""
               }`}
             >
               <img src="/images/globe.png" alt="globe" width={50} />
-              <span>Open</span>
+              <span className="font-semibold text-gray-300">Open</span>
             </div>
             <div
               onClick={() => setRoomType("social")}
-              className={`${styles.typeBox} ${
+              className={`justify-evenly ${styles.typeBox} ${
                 roomType === "social" ? styles.active : ""
               }`}
             >
               <img src="/images/social.png" alt="social" />
-              <span>Social</span>
+              <span className="font-semibold text-gray-300">Social</span>
             </div>
             <div
               onClick={() => setRoomType("private")}
-              className={`${styles.typeBox} ${
+              className={` flex justify-evenly ${styles.typeBox} ${
                 roomType === "private" ? styles.active : ""
               }`}
             >
               <img src="/images/lock.png" alt="lock" />
-              <span>Private</span>
+              <span className="font-semibold text-gray-300">Private</span>
             </div>
           </div>
         </div>
         <div className={styles.modalFooter}>
-          <h2>Start a room, open to everyone</h2>
+          <p className="text-lg font-semibold text-gray-300">Start a room, open to everyone</p>
+          <br />
           <button onClick={createRoom} className={styles.footerButton}>
             <img src="/images/team.png" alt="celebration" width={25} />
             <span>Let's go</span>

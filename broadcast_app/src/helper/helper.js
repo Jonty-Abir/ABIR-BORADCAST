@@ -34,9 +34,30 @@ export const activateUser = async ({ name, avatar }) => {
 
 export const logout = async () => {
   try {
-    const {data} = await instance.post("/logout");
+    const { data } = await instance.post("/logout");
     return data;
   } catch (err) {
     console.log("error was occure while user logout!");
+  }
+};
+
+export const createRoom = async (tropic, roomType) => {
+  try {
+    const { data } = await instance.post("/rooms", { tropic, roomType });
+    console.log(data);
+    return data;
+  } catch (err) {
+    console.log(err.message);
+    return err;
+  }
+};
+
+export const getAllRooms = async () => {
+  try {
+    const { data } = await instance.get("/rooms");
+    return data;
+  } catch (err) {
+    console.log(err?.massage);
+    return err;
   }
 };

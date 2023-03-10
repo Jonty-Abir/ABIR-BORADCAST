@@ -9,14 +9,7 @@ const Navigation = () => {
   const state = useSelector((state) => state.auth);
   const check = state.isAuth && state.user.activated ? true : false;
   const dispatch = useDispatch();
-  const brandStyle = {
-    color: "#fff",
-    textDecoration: "none",
-    fontWeight: "bold",
-    fontSize: "22px",
-    display: "flex",
-    alignItems: "center",
-  };
+  
 
   async function handelLogout() {
     try {
@@ -43,7 +36,7 @@ const Navigation = () => {
               className="ring-4 ring-blue-600 rounded-full"
               src={
                 check
-                  ? `${process.env.REACT_APP_STATIC_URL}${state.user.avatar}`
+                  ? `${state.user.avatar}`
                   : "/images/avatar.png"
               }
               alt="avatar"
