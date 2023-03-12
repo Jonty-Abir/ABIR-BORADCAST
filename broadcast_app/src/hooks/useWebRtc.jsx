@@ -2,7 +2,7 @@
 
 import freeice from "freeice";
 import { useCallback, useEffect, useRef } from "react";
-import { ACTION } from "../action";
+import { ACTIONS } from "../action";
 import socketInit from "../Socket";
 import useStateWithCallBack from "./useStateWithCallBack";
 
@@ -12,7 +12,7 @@ function useWebRtc(roomId, user) {
   const connections = useRef({});
   const localMediaStrem = useRef(null);
   const socket = useRef(null);
-
+  const clientsRerf = useRef([]);
   /***_______  addNewClient / checker   ________**/
 
   const addNewClient = useCallback(
@@ -34,17 +34,13 @@ function useWebRtc(roomId, user) {
   }, []);
 
   /***_______  Handle new peer   ________**/
-  
+
   useEffect(() => {
-    const handelNewPeer = async ({
-      peerId,
-      createOffer,
-      user: remoteUser,
-    }) => {
+    const handelNewPeer = async ({ peerId, createOffer, user: remoteUser }) => {
       // check if user already connected
       if (peerId in connections.current) {
         return console.warn(
-          `You are already connected with: ${peerId}-//-${user.name}`
+          `You are already connected with: ${peerId}-${user.name} :)`
         );
       }
       connections.current[peerId] = new RTCPeerConnection({
@@ -54,14 +50,14 @@ function useWebRtc(roomId, user) {
       connections.current[peerId].onicecandidate = (event) => {
         /***_______  Email Relay Ice   ________**/
 
-        socket.current.emit(ACTION.RELAY_ICE, {
+        socket.current.emit(ACTIONS.RELAY_ICE, {
           peerId,
           icecandidate: event.candidate,
         });
       };
       // handel on track on this connection
       connections.current[peerId].ontrack = ({ streams: [remoteStream] }) => {
-        addNewClient(remoteUser, () => {
+        addNewClient({ ...remoteUser, muted: true }, () => {
           if (audioElement.current[remoteUser._id]) {
             audioElement.current[remoteUser._id].srcObject = remoteStream;
           } else {
@@ -89,17 +85,17 @@ function useWebRtc(roomId, user) {
         // send offer to another client
         /***_______   Emit Relay SDP  ________**/
 
-        socket.current.emit(ACTION.RELAY_SDP, {
+        socket.current.emit(ACTIONS.RELAY_SDP, {
           peerId,
           sessionDescription: offer,
         });
       }
     };
     // socket.current.on
-    socket.current.on(ACTION.ADD_PEER, handelNewPeer);
+    socket.current.on(ACTIONS.ADD_PEER, handelNewPeer);
 
     return () => {
-      socket.current.off(ACTION.ADD_PEER);
+      socket.current.off(ACTIONS.ADD_PEER);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -113,7 +109,7 @@ function useWebRtc(roomId, user) {
       });
     };
     startCapture().then(() => {
-      addNewClient(user, () => {
+      addNewClient({ ...user, muted: true }, () => {
         const localElement = audioElement.current[user._id];
         if (localElement) {
           localElement.volume = 0;
@@ -121,14 +117,14 @@ function useWebRtc(roomId, user) {
         }
         /***_______  Socket emit join   ________**/
         // send to server
-        socket.current.emit(ACTION.JOIN, { roomId, user });
+        socket.current.emit(ACTIONS.JOIN, { roomId, user });
       });
     });
     return () => {
       // leave the room
       if (localMediaStrem.current) {
         localMediaStrem?.current.getTracks().forEach((track) => track.stop());
-        socket.current.emit(ACTION.LEAVE, { roomId });
+        socket.current.emit(ACTIONS.LEAVE, { roomId });
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,13 +133,13 @@ function useWebRtc(roomId, user) {
   /***_______  HANDLE ICE CANDIDATE   ________**/
 
   useEffect(() => {
-    socket.current.on(ACTION.ICE_CANDIDATE, ({ peerId, icecandidate }) => {
+    socket.current.on(ACTIONS.ICE_CANDIDATE, ({ peerId, icecandidate }) => {
       if (icecandidate) {
         connections.current[peerId].addIceCandidate(icecandidate);
       }
     });
     return () => {
-      socket.current.off(ACTION.ICE_CANDIDATE);
+      socket.current.off(ACTIONS.ICE_CANDIDATE);
     };
   }, []);
 
@@ -165,15 +161,15 @@ function useWebRtc(roomId, user) {
 
         connection.setLocalDescription(answer);
 
-        socket.current.emit(ACTION.RELAY_SDP, {
+        socket.current.emit(ACTIONS.RELAY_SDP, {
           peerId,
           sessionDescription: answer,
         });
       }
     };
-    socket.current.on(ACTION.SESSION_DESCRIPTION, handleRemoteSdp);
+    socket.current.on(ACTIONS.SESSION_DESCRIPTION, handleRemoteSdp);
     return () => {
-      socket.current.off(ACTION.SESSION_DESCRIPTION);
+      socket.current.off(ACTIONS.SESSION_DESCRIPTION);
     };
   }, []);
 
@@ -190,11 +186,60 @@ function useWebRtc(roomId, user) {
       delete audioElement.current[peerId];
       setClientState((list) => list.filter((client) => client._id !== userId));
     };
-    socket.current.on(ACTION.REMOVE_PEER, handleRemovePeer);
+    socket.current.on(ACTIONS.REMOVE_PEER, handleRemovePeer);
     return () => {
-      socket.current.off(ACTION.REMOVE_PEER);
+      socket.current.off(ACTIONS.REMOVE_PEER);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /***_______  handleMute   ________**/
+
+  const handleMute = (isMute, userId) => {
+    let settled;
+    const interval = setInterval(() => {
+      if (localMediaStrem.current) {
+        localMediaStrem.current.getTracks()[0].enabled = !isMute;
+        if (isMute) {
+          socket.current.emit(ACTIONS.MUTE, { roomId, userId });
+        } else {
+          socket.current.emit(ACTIONS.UN_MUTE, { roomId, userId });
+        }
+        settled = true;
+      }
+      if (settled) {
+        clearInterval(interval);
+      }
+    }, 200);
+  };
+
+  /***_______ store client copy at ClientRef   ________**/
+
+  useEffect(() => {
+    clientsRerf.current = clients;
+  }, [clients]);
+
+  /***_______  Listen Mute / Un-Mute   ________**/
+  useEffect(() => {
+    //  for Mute
+    socket.current.on(ACTIONS.MUTE, ({ roomId, userId }) => {
+      setMute(true, userId);
+    });
+    //   for Un-Mute
+    socket.current.on(ACTIONS.UN_MUTE, ({ roomId, userId }) => {
+      setMute(false, userId);
+    });
+    const setMute = (mute, userId) => {
+      const clientIndx = clientsRerf.current
+        .map((client) => client._id)
+        .indexOf(userId);
+      const connectedClients = JSON.parse(JSON.stringify(clientsRerf.current));
+      // JSON.parse(JSON.stringify(clientsRerf.current));
+      if (clientIndx > -1) {
+        connectedClients[clientIndx].muted = mute;
+        setClientState(connectedClients);
+      }
+    };
   }, []);
 
   /***_______   Create reference provider  ________**/
@@ -203,7 +248,7 @@ function useWebRtc(roomId, user) {
     audioElement.current[userId] = instance;
   };
 
-  return [clients, providerRef];
+  return [clients, providerRef, handleMute];
 }
 
 export default useWebRtc;

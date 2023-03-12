@@ -51,11 +51,26 @@ export const createRoom = async (tropic, roomType) => {
     return err;
   }
 };
+/***_______  GET ALL ROOM   ________**/
 
 export const getAllRooms = async () => {
   try {
     const { data } = await instance.get("/rooms");
     return data;
+  } catch (err) {
+    console.log(err?.massage);
+    return err;
+  }
+};
+
+/***_______  GET SINGLE ROOM   ________**/
+
+export const getOneRoom = async (roomID) => {
+  try {
+    if (!roomID) throw new Error("roomIf required!");
+    const { data } = await instance.get("/rooms");
+    const singleRoom = data.rooms.filter((value) => value._id === roomID);
+    return singleRoom[0];
   } catch (err) {
     console.log(err?.massage);
     return err;

@@ -1,5 +1,4 @@
 import cors from "cors";
-// @ts-ignore
 import dotenv from "dotenv";
 import express from "express";
 
@@ -38,10 +37,8 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
-/***_______     ________**/
-
+/***_______  Morgan   ________**/
 app.use(morgan("tiny"));
-/***_______     ________**/
 
 /***_______ LOCAL= mongodb://127.0.0.1:27017/Abir    ________**/
 connection();
@@ -110,6 +107,26 @@ io.on("connection", (socket) => {
       sessionDescription,
     });
   });
+
+  /***_______  Handle Mute Un-Mute   ________**/
+  // mute
+
+  socket.on(ACTION.MUTE, ({ roomId, userId }) => {
+    // console.log(userId, "mute");
+    const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
+    clients.forEach((clientId) => {
+      io.to(clientId).emit(ACTION.MUTE, { peerId: socket.id, userId });
+    });
+  });
+  // un_mute
+  socket.on(ACTION.UN_MUTE, ({ roomId, userId }) => {
+    // console.log(userId, "un-mute");
+    const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
+    clients.forEach((clientId) => {
+      io.to(clientId).emit(ACTION.UN_MUTE, { peerId: socket.id, userId });
+    });
+  });
+
   // leve the room
   const leveRoom = () => {
     const { rooms } = socket;

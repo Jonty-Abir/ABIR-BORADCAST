@@ -7,7 +7,7 @@ const socketInit = () => {
     timeout: 10000,
     transport: ["websocket"],
   };
-  return io("http://localhost:8080", option);
+  return io(process.env.REACT_APP_SERVER_URL, option);
 };
 
 export default socketInit;

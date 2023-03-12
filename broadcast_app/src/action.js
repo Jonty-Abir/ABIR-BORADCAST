@@ -1,4 +1,4 @@
-export const ACTION = {
+export const ACTIONS = {
   JOIN: "join",
   LEAVE: "leave",
   ADD_PEER: "add_peer",
@@ -7,4 +7,6 @@ export const ACTION = {
   ICE_CANDIDATE: "ice_candidate",
   SESSION_DESCRIPTION: "session_description",
   REMOVE_PEER: "remove-peer",
+  MUTE: "mute",
+  UN_MUTE: "un_mute",
 };

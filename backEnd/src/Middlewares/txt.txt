@@ -1,0 +1,56 @@
+_______________________________________BROwSER1__________________________________________________________
+
+const preeConnectio= new RTCPeerConnection()
+const dataChanel= preeConnectio.createDataChannel("bigData")
+dataChanel.onopen=()=> console.log("chanel opened")
+dataChanel.onmessage=(e)=> console.log("Message:"+ e.data)
+preeConnectio.onicecandidate=(e)=>console.log("ice_candidate:", JSON.stringify(preeConnectio.localDescription))
+const offer= await preeConnectio.createOffer()
+await preeConnectio.setLocalDescription(offer)
+
+
+const answer= {"type":"answer","sdp":"v=0\r\no=- 2562058304076612480 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group
+:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 60660 UDP/DTLS/SCTP webrtc-datachanne
+l\r\nc=IN IP4 192.168.43.123\r\na=candidate:3722178825 1 udp 2122129151 192.168.43.123 60660 typ host generation
+ 0 network-id 1 network-cost 10\r\na=candidate:1087435336 1 udp 2122262783 2401:4900:3fc5:2034:9d17:2477:846e:bb0d 
+ 60661 typ host generation 0 network-id 2 network-cost 10\r\na=candidate:2927273942 1 udp 2122197247 2401:4900:3fc
+ 5:2034:a63b:57ba:3c69:40b7 60662 typ host generation 0 network-id 3 network-cost 10\r\na=ice-ufrag:Zs7n\r\na=ice-
+ pwd:r4G0heVi6RMVzF+HS6ujNcKD\r\na=ice-options:trickle\r\na=fingerprint:sha-256 04:41:B2:A6:45:3D:67:30:5F:92:6D:36:57:
+ F8:FD:4D:2B:5D:F1:21:43:DE:7F:A4:FB:FF:BF:F3:80:9A:B3:DB\r\na=setup:active\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"}
+
+last-----
+await preeConnectio.setRemoteDescription(answer)
+
+
+
+_______________________________________BROwSER1__________________________________________________________
+
+const preeConnection= new RTCPeerConnection()
+
+
+const offer= {"type":"offer","sdp":"v=0\r\no=- 3595963577645478989 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=grou
+p:BUNDLE 0\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r
+\nc=IN IP4 0.0.0.0\r\na=candidate:788330375 1 udp 2113937151 ae9b5fbe-191d-4ff5-933c-c4a13f56988d.local 62736 ty
+p host generation 0 network-cost 999\r\na=candidate:800755074 1 udp 2113939711 1958f0c3-4a43-4a95-b6d5-d01c8b803
+e5b.local 62737 typ host generation 0 network-cost 999\r\na=ice-ufrag:ekT9\r\na=ice-pwd:CpirWld09UqnEgYnjJ+Ywkl/\
+r\na=ice-options:trickle\r\na=fingerprint:sha-256 98:72:FC:97:63:AF:5C:9A:4A:FC:06:80:67:F3:0A:08:48:1C:0D:A1:80:B1
+:14:E8:13:D0:01:5D:24:8E:4B:EC\r\na=setup:actpass\r\na=mid:0\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"}
+
+
+preeConnection.onicecandidate=(e)=> console.log("Ice_candidate:",JSON.stringify(preeConnection.localDescription))
+
+await preeConnection.setRemoteDescription(offer)
+
+let dataChanel;
+
+
+preeConnection.ondatachannel=(e)=>{
+
+    dataChanel= e.channel;
+    dataChanel.onopen=()=> console.log("channel opened!")
+    dataChanel.onmessage=(e)=> console.log("Message:"+ e.data)
+	}
+	
+	const answer= await preeConnection.createAnswer()
+	
+	await preeConnection.setLocalDescription(answer)

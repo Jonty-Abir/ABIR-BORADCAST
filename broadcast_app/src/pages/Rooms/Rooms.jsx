@@ -19,8 +19,8 @@ const Rooms = () => {
     return <h2>Error was Occure!</h2>;
   }
   if (isLoading)
-    return <Loader message="React Query Sitll fetching be patient!" />;
-  const rooms = data.rooms;
+    return <Loader message="Loading..." />;
+  const rooms = data.rooms ;
   return (
     <>
       <div className="">
